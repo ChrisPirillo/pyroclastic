@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en"><head><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-1CQ4D3VQ3L"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-1CQ4D3VQ3L');
+  </script>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+
+<title>Pyroclastic: Procedural Web Fire Simulator</title>
+
+<meta name="description" content="An immersive procedural fire simulator with customizable physics, volumetric shaders, and generative audio. Design, randomize, and export 4K visuals.">
+<meta name="keywords" content="fire simulator, procedural art, Three.js, WebGL shaders, generative audio, ambient visualizer, interactive simulation, GLSL">
+<meta name="author" content="Chris Pirillo">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0f172a">
+
+<meta property="og:site_name" content="Chris Pirillo's Arcade">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Pyroclastic: Procedural Web Fire Simulator">
+<meta property="og:description" content="An immersive procedural fire simulator with customizable physics, volumetric shaders, and generative audio. Design, randomize, and export 4K visuals.">
+<meta property="og:url" content="https://pirillo.com/arcade/pyroclastic.html">
+<meta property="og:image" content="https://pirillo.com/arcade/images/pyroclastic.png">
+<meta property="og:image:alt" content="Pyroclastic: Procedural Web Fire Simulator">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@ChrisPirillo">
+<meta name="twitter:creator" content="@ChrisPirillo">
+<meta name="twitter:title" content="Pyroclastic: Procedural Web Fire Simulator">
+<meta name="twitter:description" content="An immersive procedural fire simulator with customizable physics, volumetric shaders, and generative audio. Design, randomize, and export 4K visuals.">
+<meta name="twitter:image" content="https://pirillo.com/arcade/images/pyroclastic.png">
+<meta name="twitter:domain" content="pirillo.com">
+
+<link rel="canonical" href="https://pirillo.com/arcade/pyroclastic.html">
+
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Pyroclastic: Procedural Web Fire Simulator",
+  "description": "An immersive procedural fire simulator with customizable physics, volumetric shaders, and generative audio. Design, randomize, and export 4K visuals.",
+  "keywords": "fire simulator, procedural art, Three.js, WebGL shaders, generative audio, ambient visualizer, interactive simulation, GLSL",
+  "url": "https://pirillo.com/arcade/pyroclastic.html",
+  "image": "https://pirillo.com/arcade/images/pyroclastic.png",
+  "primaryImageOfPage": {
+    "@type": "ImageObject",
+    "url": "https://pirillo.com/arcade/images/pyroclastic.png"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Chris Pirillo",
+    "url": "https://pirillo.com",
+    "sameAs": [
+      "https://x.com/ChrisPirillo"
+    ]
+  },
+  "mainEntity": {
+    "name": "Pyroclastic: Procedural Web Fire Simulator",
+    "description": "An immersive procedural fire simulator with customizable physics, volumetric shaders, and generative audio. Design, randomize, and export 4K visuals.",
+    "image": "https://pirillo.com/arcade/images/pyroclastic.png",
+    "operatingSystem": "Web Browser",
+    "author": {
+      "@type": "Person",
+      "name": "Chris Pirillo"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock"
+    },
+    "@type": "WebApplication",
+    "applicationCategory": "Simulation"
+  }
+}</script>
+
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap'); :root { --glass-bg: rgba(15, 15, 20, 0.92); --glass-border: rgba(255, 255, 255, 0.1); --accent: #ff4500; --text: #ececec; --text-dim: #999; }
+body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; font-family: 'Inter', sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; }
+#canvas-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+#fade-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 50; pointer-events: none; opacity: 0; transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+#ui-container { position: absolute; top: 20px; right: 20px; width: 320px; max-height: calc(100vh - 40px); z-index: 100; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.glass-panel { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 12px; padding: 0; box-shadow: 0 8px 32px rgba(0,0,0,0.5); pointer-events: auto; overflow: hidden; transition: transform 0.3s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.3s ease; }
+.glass-panel.hidden { transform: translateX(40px); opacity: 0; pointer-events: none; }
+.ui-header { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); }
+.ui-title { font-weight: 600; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; color: white; display: flex; align-items: center; gap: 8px; }
+.header-actions { display: flex; align-items: center; gap: 12px; }
+.toggle-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 14px; padding: 4px; transition: color 0.2s; }
+.toggle-btn:hover { color: white; }
+.ui-content { overflow-y: auto; max-height: 85vh; padding: 0; }
+.ui-content::-webkit-scrollbar { width: 4px; }
+.ui-content::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+.section { border-bottom: 1px solid var(--glass-border); }
+.section-header { padding: 10px 16px; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-dim); cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.1); }
+.section-header:hover { background: rgba(255,255,255,0.05); color: white; }
+.section.collapsed .section-content { display: none; }
+.section-content { padding: 12px 16px 16px 16px; }
+.control-row { margin-bottom: 14px; }
+.label-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: #ccc; }
+.val-display { color: var(--accent); font-weight: 500; font-feature-settings: "tnum"; }
+input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #e0e0e0; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.6); }
+.color-group { display: flex; gap: 8px; margin-top: 8px; }
+.color-wrapper { flex: 1; position: relative; height: 32px; border-radius: 6px; overflow: hidden; border: 1px solid var(--glass-border); }
+input[type="color"] { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; cursor: pointer; border: none; }
+.actions { padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 10px; border-radius: 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+.btn:hover { background: white; color: black; }
+.btn-primary { background: var(--accent); border-color: var(--accent); grid-column: span 2; }
+#menu-trigger { position: absolute; top: 20px; right: 20px; width: 44px; height: 44px; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 12px; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 90; opacity: 0; pointer-events: none; transition: all 0.3s; }
+#menu-trigger.visible { opacity: 1; pointer-events: auto; }
+#help-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.modal-content { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.modal-content h2 { margin-top: 0; font-size: 1.5rem; color: var(--accent); }
+.modal-content p { color: #ccc; line-height: 1.6; margin: 20px 0; font-size: 0.95rem; }
+.modal-links { display: flex; flex-direction: column; gap: 10px; }
+.modal-links a { color: white; text-decoration: none; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid var(--glass-border); transition: all 0.2s; }
+.modal-links a:hover { background: var(--accent); border-color: var(--accent); }
+.switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 12px; color: #ccc; }
+.switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .4s; border-radius: 20px; }
+.slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--accent); }
+input:checked + .slider:before { transform: translateX(16px); }</style>
+</head>
+<body><h1 style="display: none;">Pyroclastic: Procedural Web Fire Simulator</h1>
+
+    <div id="canvas-container"></div>
+    <div id="fade-overlay"></div>
+
+    <div id="menu-trigger" class="visible"><i class="fas fa-sliders-h"></i></div>
+
+    <div id="ui-container">
+        <div class="glass-panel hidden" id="main-panel">
+            <div class="ui-header">
+                <div class="ui-title"><i class="fas fa-fire"></i> Pyroclastic Flow</div>
+                <div class="header-actions">
+                    <button class="toggle-btn" id="open-help" title="Help"><i class="far fa-question-circle"></i></button>
+                    <button class="toggle-btn" id="close-panel" title="Close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
+            <div class="ui-content">
+                <div class="section">
+                    <div class="section-header">Physics <i class="fas fa-chevron-down"></i></div>
+                    <div class="section-content">
+                        <div class="control-row">
+                            <div class="label-row"><span>Rise Speed</span><span class="val-display" id="val-speed">2.30</span></div>
+                            <input type="range" id="inp-speed" min="0" max="5.0" step="0.1" value="2.3">
+                        </div>
+                        <div class="control-row">
+                            <div class="label-row"><span>Turbulence</span><span class="val-display" id="val-noise">1.90</span></div>
+                            <input type="range" id="inp-noise" min="0.1" max="4.0" step="0.1" value="1.9">
+                        </div>
+                        <div class="control-row">
+                            <div class="label-row"><span>Vertical Bias</span><span class="val-display" id="val-verticality">1.30</span></div>
+                            <input type="range" id="inp-verticality" min="0.5" max="3.0" step="0.1" value="1.3">
+                        </div>
+                        <div class="control-row">
+                            <div class="label-row"><span>Vertical Reach</span><span class="val-display" id="val-falloff">1.55</span></div>
+                            <input type="range" id="inp-falloff" min="0.2" max="3.0" step="0.05" value="1.55">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">Appearance <i class="fas fa-chevron-down"></i></div>
+                    <div class="section-content">
+                        <div class="control-row">
+                            <div class="label-row"><span>Opacity</span><span class="val-display" id="val-density">0.90</span></div>
+                            <input type="range" id="inp-density" min="0.1" max="1.5" step="0.05" value="0.9">
+                        </div>
+                         <div class="control-row">
+                            <div class="label-row"><span>White Threshold</span><span class="val-display" id="val-white">0.95</span></div>
+                            <input type="range" id="inp-white" min="0.6" max="1.3" step="0.01" value="0.95">
+                        </div>
+                        <div class="label-row" style="margin-top:10px;"><span>Palette (Core / Edge / BG)</span></div>
+                        <div class="color-group">
+                            <div class="color-wrapper"><input type="color" id="inp-color-core" value="#ff5500" title="Core Color"></div>
+                            <div class="color-wrapper"><input type="color" id="inp-color-tip" value="#440000" title="Edge Color"></div>
+                            <div class="color-wrapper"><input type="color" id="inp-color-bg" value="#000000" title="Background"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">Environment <i class="fas fa-chevron-down"></i></div>
+                    <div class="section-content">
+                        <div class="switch-row">
+                            <span>Pop &amp; Crackle Sound</span>
+                            <label class="switch">
+                                <input type="checkbox" id="inp-audio">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="control-row">
+                            <div class="label-row"><span>Roar Volume</span><span class="val-display" id="val-roar">0.40</span></div>
+                            <input type="range" id="inp-roar" min="0.0" max="1.0" step="0.05" value="0.2">
+                        </div>
+                        <div class="control-row">
+                            <div class="label-row"><span>Layer Count</span><span class="val-display" id="val-count">15</span></div>
+                            <input type="range" id="inp-count" min="5" max="40" step="1" value="15">
+                        </div>
+                        <div class="control-row">
+                            <div class="label-row"><span>Resolution Scale</span><span class="val-display" id="val-pixel">1.0</span></div>
+                            <input type="range" id="inp-pixel" min="0.25" max="2.0" step="0.25" value="1.0">
+                        </div>
+                        <div class="control-row">
+                            <div class="label-row"><span>Auto-Randomize (s)</span><span class="val-display" id="val-auto">0</span></div>
+                            <input type="range" id="inp-auto" min="0" max="60" step="5" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" id="btn-randomize">Randomize</button>
+                    <button class="btn" id="btn-wallpaper"><i class="fas fa-image"></i> 4K Save</button>
+                    <button class="btn" id="btn-reset"><i class="fas fa-undo"></i> Reset Defaults</button>
+                </div>
+                
+                <div style="padding: 0 16px 16px; display:flex; gap:8px;">
+                    <button class="btn" style="flex:1;" id="btn-export">Export</button>
+                    <button class="btn" style="flex:1;" id="btn-import">Import</button>
+                    <input type="file" id="file-input" style="display:none;" accept=".json">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal">
+        <div class="modal-content">
+            <h2>Pyroclastic Flow</h2>
+            <p>A procedural volumetric fire simulator designed for deep immersion. Click the background to randomize. Toggle "Pop &amp; Crackle" for high-fidelity procedural audio.</p>
+            <div class="modal-links">
+                <a href="https://pirillo.com/arcade/" target="_blank">More Apps</a>
+                <a href="https://chris.pirillo.com/" target="_blank">Follow Chris</a>
+                <a href="https://ctrlaltcreate.live/" target="_blank">Learn More</a>
+                <button class="btn" id="close-help-btn" style="margin-top:10px; width: 100%;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+    const DEFAULTS = {
+        speed: 2.3, density: 0.9, noiseScale: 1.9, falloff: 1.55, verticality: 1.3,
+        whiteThreshold: 0.95, colorCore: '#ff5500', colorTip: '#440000', colorBg: '#000000',
+        flameCount: 15, pixelRatio: 1.0, autoInterval: 0, audioEnabled: false, roarVolume: 0.4
+    };
+    
+    let state = { ...DEFAULTS };
+
+    // --- AUDIO SYSTEM ---
+    let audioCtx, brownNoise, crackleGain, humGain, masterGain;
+    let noiseBuffer; // Reusable buffer for pops
+
+    function initAudio() {
+        if (audioCtx) return;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0;
+        masterGain.connect(audioCtx.destination);
+
+        // Brown noise for the low-end rumble
+        const bufferSize = 2 * audioCtx.sampleRate;
+        const rumbleBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const output = rumbleBuffer.getChannelData(0);
+        let lastOut = 0;
+        for (let i = 0; i < bufferSize; i++) {
+            let white = Math.random() * 2 - 1;
+            output[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = output[i];
+            output[i] *= 3.5; 
+        }
+        brownNoise = audioCtx.createBufferSource();
+        brownNoise.buffer = rumbleBuffer;
+        brownNoise.loop = true;
+
+        // White noise buffer for crackles
+        noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.1, audioCtx.sampleRate);
+        const noiseData = noiseBuffer.getChannelData(0);
+        for(let i=0; i<noiseData.length; i++) noiseData[i] = Math.random() * 2 - 1;
+
+        humGain = audioCtx.createGain();
+        humGain.gain.value = state.roarVolume;
+        
+        const lowFilter = audioCtx.createBiquadFilter();
+        lowFilter.type = 'lowpass';
+        lowFilter.frequency.value = 400;
+
+        brownNoise.connect(humGain);
+        humGain.connect(lowFilter);
+        lowFilter.connect(masterGain);
+        brownNoise.start();
+
+        // Crackle generator
+        crackleGain = audioCtx.createGain();
+        crackleGain.gain.value = 0.6;
+        crackleGain.connect(masterGain);
+
+        function playCrackle() {
+            if (!state.audioEnabled) return;
+
+            // Variation in pop intensity and duration
+            const isBigPop = Math.random() > 0.9;
+            
+            const source = audioCtx.createBufferSource();
+            source.buffer = noiseBuffer;
+            
+            const g = audioCtx.createGain();
+            const f = audioCtx.createBiquadFilter();
+            
+            f.type = 'bandpass';
+            f.frequency.setValueAtTime(Math.random() * 3000 + 1000, audioCtx.currentTime);
+            f.Q.value = 2;
+
+            g.gain.setValueAtTime(0, audioCtx.currentTime);
+            g.gain.linearRampToValueAtTime(isBigPop ? 0.4 : 0.15, audioCtx.currentTime + 0.001);
+            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + (isBigPop ? 0.1 : 0.03));
+
+            source.connect(g);
+            g.connect(f);
+            f.connect(crackleGain);
+            
+            source.start();
+            
+            // Random interval between pops
+            setTimeout(playCrackle, Math.random() * (isBigPop ? 1000 : 250) + 50);
+        }
+        playCrackle();
+    }
+
+    function toggleAudio(enabled) {
+        state.audioEnabled = enabled;
+        if (enabled) {
+            if (!audioCtx) initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            masterGain.gain.setTargetAtTime(1.0, audioCtx.currentTime, 0.1);
+        } else if (masterGain) {
+            masterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+        }
+    }
+
+    // --- RENDERER SETUP ---
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 5);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance", preserveDrawingBuffer: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(state.pixelRatio);
+    container.appendChild(renderer.domElement);
+
+    const vertexShader = `
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    `;
+
+    const fragmentShader = `
+        uniform float iTime;
+        uniform float randomOffset;
+        uniform vec3 colorCore;
+        uniform vec3 colorTip;
+        uniform float noiseScale;
+        uniform float density;
+        uniform float falloff;
+        uniform float verticality;
+        uniform float whiteThreshold;
+        
+        varying vec2 vUv;
+        
+        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+        vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+        float snoise(vec3 v) { 
+            const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+            const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+            vec3 i  = floor(v + dot(v, C.yyy));
+            vec3 x0 = v - i + dot(i, C.xxx);
+            vec3 g = step(x0.yzx, x0.xyz);
+            vec3 l = 1.0 - g;
+            vec3 i1 = min(g.xyz, l.zxy);
+            vec3 i2 = max(g.xyz, l.zxy);
+            vec3 x1 = x0 - i1 + C.xxx;
+            vec3 x2 = x0 - i2 + C.yyy;
+            vec3 x3 = x0 - D.yyy;
+            i = mod289(i);
+            vec4 p = permute(permute(permute(i.z + vec4(0.0, i1.z, i2.z, 1.0)) + i.y + vec4(0.0, i1.y, i2.y, 1.0)) + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+            float n_ = 0.142857142857;
+            vec3 ns = n_ * D.wyz - D.xzx;
+            vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+            vec4 x_ = floor(j * ns.z);
+            vec4 y_ = floor(j - 7.0 * x_);
+            vec4 x = x_ * ns.x + ns.yyyy;
+            vec4 y = y_ * ns.x + ns.yyyy;
+            vec4 h = 1.0 - abs(x) - abs(y);
+            vec4 b0 = vec4(x.xy, y.xy);
+            vec4 b1 = vec4(x.zw, y.zw);
+            vec4 s0 = floor(b0)*2.0 + 1.0;
+            vec4 s1 = floor(b1)*2.0 + 1.0;
+            vec4 sh = -step(h, vec4(0.0));
+            vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+            vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+            vec3 p0 = vec3(a0.xy, h.x);
+            vec3 p1 = vec3(a0.zw, h.y);
+            vec3 p2 = vec3(a1.xy, h.z);
+            vec3 p3 = vec3(a1.zw, h.w);
+            vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+            p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+            vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+            m = m * m;
+            return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+        }
+
+        void main() {
+            float jitter = snoise(vec3(vUv.x * 10.0, randomOffset, 0.0)) * 0.05;
+            float maskX = smoothstep(0.0, 0.15, vUv.x) * smoothstep(1.0, 0.85, vUv.x);
+            float reach = clamp(falloff * 0.8, 0.1, 2.0);
+            float maskY = smoothstep(0.0, 0.1, vUv.y + jitter) * smoothstep(1.0, 0.9, vUv.y - jitter);
+            maskY *= smoothstep(reach, reach * 0.5, vUv.y);
+            float borderMask = maskX * maskY;
+
+            if (borderMask < 0.001) discard;
+
+            vec2 p = vUv * 2.0 - 1.0;
+            float time = iTime + randomOffset;
+            float n1 = snoise(vec3(p.x * noiseScale * 0.5, (p.y * noiseScale * 0.5 / verticality) - time * 0.8, time * 0.1));
+            vec2 warpedUV = p + vec2(n1 * 0.5, n1 * 0.3);
+            float fire = snoise(vec3(warpedUV.x * 2.5 / sqrt(verticality), warpedUV.y - time * 1.5, time * 0.4));
+            
+            float intensity = fire * 0.5 + 0.5;
+            intensity = pow(intensity, 3.0); 
+            intensity *= density;
+            intensity *= borderMask;
+
+            float baseHeat = smoothstep(0.4, 0.0, vUv.y);
+            float adjustedIntensity = intensity + baseHeat * 0.2;
+
+            vec3 col = vec3(0.0);
+            
+            // Fixed relative color thresholds to ensure palette colors and slider work correctly
+            float t1 = whiteThreshold * 0.3;
+            float t2 = whiteThreshold * 0.65;
+            
+            if (adjustedIntensity < t1) {
+                col = mix(vec3(0.0), colorTip, clamp(adjustedIntensity / t1, 0.0, 1.0));
+            } else if (adjustedIntensity < t2) {
+                col = mix(colorTip, colorCore, clamp((adjustedIntensity - t1) / (t2 - t1), 0.0, 1.0));
+            } else {
+                col = mix(colorCore, vec3(1.0), clamp((adjustedIntensity - t2) / (whiteThreshold - t2), 0.0, 1.0));
+            }
+
+            gl_FragColor = vec4(col, smoothstep(0.05, 0.3, intensity) * borderMask);
+        }
+    `;
+
+    const geometry = new THREE.PlaneGeometry(12, 12);
+    const flameGroup = new THREE.Group();
+    const flameMaterials = [];
+    scene.add(flameGroup);
+
+    function createFlameLayer(z) {
+        const mat = new THREE.ShaderMaterial({
+            vertexShader, fragmentShader,
+            uniforms: {
+                iTime: { value: 0 },
+                randomOffset: { value: Math.random() * 100 },
+                colorCore: { value: new THREE.Color(state.colorCore) },
+                colorTip: { value: new THREE.Color(state.colorTip) },
+                noiseScale: { value: state.noiseScale },
+                density: { value: state.density },
+                falloff: { value: state.falloff },
+                verticality: { value: state.verticality },
+                whiteThreshold: { value: state.whiteThreshold }
+            },
+            transparent: true, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending 
+        });
+        flameMaterials.push(mat);
+        const mesh = new THREE.Mesh(geometry, mat);
+        const vJitter = (Math.random() - 0.5) * 1.2;
+        mesh.position.set(0, -1.0 + vJitter, z); 
+        mesh.position.x += (Math.random() - 0.5) * 6.0;
+        return mesh;
+    }
+
+    function generateField() {
+        while(flameGroup.children.length) flameGroup.remove(flameGroup.children[0]);
+        flameMaterials.length = 0;
+        const count = state.flameCount;
+        for(let i=0; i<count; i++) {
+            const z = -8 + (i / count) * 10;
+            flameGroup.add(createFlameLayer(z));
+        }
+    }
+
+    const KEY_MAP = {
+        'inp-speed': 'speed', 'inp-noise': 'noiseScale', 'inp-falloff': 'falloff',
+        'inp-verticality': 'verticality', 'inp-density': 'density', 'inp-white': 'whiteThreshold',
+        'inp-count': 'flameCount', 'inp-pixel': 'pixelRatio', 'inp-auto': 'autoInterval',
+        'inp-color-core': 'colorCore', 'inp-color-tip': 'colorTip', 'inp-color-bg': 'colorBg',
+        'inp-audio': 'audioEnabled', 'inp-roar': 'roarVolume'
+    };
+
+    function updateUniforms() {
+        flameMaterials.forEach(m => {
+            m.uniforms.density.value = state.density;
+            m.uniforms.noiseScale.value = state.noiseScale;
+            m.uniforms.falloff.value = state.falloff;
+            m.uniforms.verticality.value = state.verticality;
+            m.uniforms.whiteThreshold.value = state.whiteThreshold;
+            m.uniforms.colorCore.value.set(state.colorCore);
+            m.uniforms.colorTip.value.set(state.colorTip);
+        });
+        scene.background = new THREE.Color(state.colorBg);
+        renderer.setPixelRatio(state.pixelRatio);
+    }
+
+    function getRandomColor() {
+        const r = Math.floor(Math.random() * 100);
+        const g = Math.floor(Math.random() * 100);
+        const b = Math.floor(Math.random() * 100);
+        return '#' + r.toString(16).padStart(2, '0') + g.toString(16).padStart(2, '0') + b.toString(16).padStart(2, '0');
+    }
+
+    function randomize(silent = false) {
+        if (!silent) {
+            const fade = document.getElementById('fade-overlay');
+            fade.style.opacity = 1;
+            setTimeout(() => { fade.style.opacity = 0; }, 400);
+        }
+        setTimeout(() => {
+            state.colorCore = getRandomColor();
+            state.colorTip = getRandomColor();
+            state.colorBg = getRandomColor();
+            state.speed = 0.5 + Math.random() * 3.0;
+            state.noiseScale = 0.8 + Math.random() * 2.5;
+            state.falloff = 0.4 + Math.random() * 2.0; 
+            state.verticality = 0.8 + Math.random() * 2.0;
+            state.density = 0.2 + Math.random() * 0.5;
+            state.whiteThreshold = 0.9 + Math.random() * 0.2; 
+            syncUIToState(); generateField(); updateUniforms();
+        }, silent ? 0 : 300);
+    }
+
+    function syncUIToState() {
+        Object.entries(KEY_MAP).forEach(([id, stateKey]) => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.type === 'checkbox') {
+                    el.checked = state[stateKey];
+                } else {
+                    el.value = state[stateKey];
+                    const dEl = document.getElementById(id.replace('inp-', 'val-'));
+                    if (dEl) dEl.innerText = typeof state[stateKey] === 'number' ? state[stateKey].toFixed(2) : state[stateKey];
+                }
+            }
+        });
+    }
+
+    const ui = { 
+        panel: document.getElementById('main-panel'), 
+        trigger: document.getElementById('menu-trigger'),
+        help: document.getElementById('help-modal')
+    };
+    
+    function toggleMenu(show) {
+        if(show) { ui.panel.classList.remove('hidden'); ui.trigger.classList.remove('visible'); }
+        else { ui.panel.classList.add('hidden'); ui.trigger.classList.add('visible'); }
+    }
+
+    document.getElementById('open-help').onclick = () => ui.help.style.display = 'flex';
+    document.getElementById('close-help-btn').onclick = () => ui.help.style.display = 'none';
+    document.getElementById('close-panel').onclick = () => toggleMenu(false);
+    ui.trigger.onclick = (e) => { e.stopPropagation(); toggleMenu(true); };
+
+    let isDragging = false;
+    document.addEventListener('mousedown', () => isDragging = false);
+    document.addEventListener('mousemove', () => isDragging = true);
+    document.addEventListener('mouseup', (e) => {
+        if (isDragging) return;
+        if (ui.help.style.display === 'flex') {
+            if (!ui.help.querySelector('.modal-content').contains(e.target)) ui.help.style.display = 'none';
+            return;
+        }
+        if (!ui.panel.classList.contains('hidden')) {
+            if (!ui.panel.contains(e.target) && e.target !== ui.trigger) toggleMenu(false);
+            return;
+        }
+        if (e.target === container || e.target.tagName === 'CANVAS') randomize(false);
+    });
+
+    Object.entries(KEY_MAP).forEach(([id, stateKey]) => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', (e) => {
+            let val = el.type === 'checkbox' ? el.checked : e.target.value;
+            if(el.type === 'range') {
+                val = parseFloat(val);
+                const dEl = document.getElementById(id.replace('inp-', 'val-'));
+                if(dEl) dEl.innerText = val.toFixed(2);
+            }
+            state[stateKey] = val;
+            if(stateKey === 'flameCount') generateField();
+            else if(stateKey === 'autoInterval') handleAuto();
+            else if(stateKey === 'audioEnabled') toggleAudio(val);
+            else if(stateKey === 'roarVolume') {
+                if (humGain) humGain.gain.setTargetAtTime(val, audioCtx.currentTime, 0.05);
+            }
+            updateUniforms();
+        });
+    });
+
+    document.querySelectorAll('.section-header').forEach(h => { h.onclick = () => h.parentElement.classList.toggle('collapsed'); });
+    document.getElementById('btn-randomize').onclick = () => randomize(false);
+    document.getElementById('btn-reset').onclick = () => { 
+        state = { ...DEFAULTS }; 
+        syncUIToState(); generateField(); updateUniforms(); toggleAudio(state.audioEnabled);
+        if (humGain) humGain.gain.setTargetAtTime(state.roarVolume, audioCtx.currentTime, 0.05);
+    };
+    
+    document.getElementById('btn-wallpaper').onclick = () => {
+        ui.panel.style.display = 'none'; ui.trigger.style.display = 'none';
+        const originalAspect = camera.aspect;
+        renderer.setSize(3840, 2160); camera.aspect = 3840 / 2160; camera.updateProjectionMatrix();
+        renderer.render(scene, camera);
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `PyroclasticFlow_4K_${timestamp}.png`;
+        const a = document.createElement('a'); a.download = filename; a.href = renderer.domElement.toDataURL('image/png'); a.click();
+        renderer.setSize(window.innerWidth, window.innerHeight); camera.aspect = originalAspect; camera.updateProjectionMatrix();
+        ui.panel.style.display = ''; ui.trigger.style.display = '';
+    };
+
+    document.getElementById('btn-export').onclick = () => {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `PyroclasticFlow_Config_${timestamp}.json`;
+        const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+        const a = document.createElement('a'); a.href = data; a.download = filename; a.click();
+    };
+    document.getElementById('btn-import').onclick = () => document.getElementById('file-input').click();
+    document.getElementById('file-input').onchange = (e) => {
+        const r = new FileReader();
+        r.onload = (evt) => { 
+            try { 
+                state = { ...state, ...JSON.parse(evt.target.result) }; 
+                syncUIToState(); generateField(); updateUniforms(); toggleAudio(state.audioEnabled);
+                if (humGain) humGain.gain.setTargetAtTime(state.roarVolume, audioCtx.currentTime, 0.05);
+            } catch(x) { console.error('Invalid JSON'); } 
+        };
+        r.readAsText(e.target.files[0]);
+    };
+
+    let autoTimer;
+    function handleAuto() { if(autoTimer) clearInterval(autoTimer); if(state.autoInterval > 0) autoTimer = setInterval(() => randomize(false), state.autoInterval * 1000); }
+
+    const clock = new THREE.Clock();
+    function animate() {
+        requestAnimationFrame(animate);
+        const dt = clock.getDelta();
+        flameMaterials.forEach(m => m.uniforms.iTime.value += dt * state.speed);
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (ui.help.style.display === 'flex') { ui.help.style.display = 'none'; }
+            else if (!ui.panel.classList.contains('hidden')) { toggleMenu(false); }
+        }
+    });
+
+    syncUIToState(); generateField(); updateUniforms(); animate();
+    window.onresize = () => { 
+        camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); 
+        renderer.setSize(window.innerWidth, window.innerHeight); 
+    };
+    </script>
+
+</body></html>
